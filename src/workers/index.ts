@@ -50,6 +50,12 @@ app.get('/health', (c) => {
     worker: 'flowstate-ai-backend',
     version: '3.0.0',
     features: ['free-models', 'super-agent', 'voice', 'research'],
+    keysConfigured: {
+      groq: !!c.env.GROQ_API_KEY,
+      together: !!c.env.TOGETHER_API_KEY,
+      gemini: !!c.env.GOOGLE_AI_API_KEY,
+      huggingface: !!c.env.HUGGINGFACE_API_KEY,
+    },
   });
 });
 

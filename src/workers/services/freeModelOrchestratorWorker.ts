@@ -6,7 +6,7 @@
 
 export interface ModelConfig {
   name: string;
-  provider: 'groq' | 'together' | 'gemini' | 'ollama';
+  provider: 'groq' | 'together' | 'gemini' | 'huggingface' | 'ollama';
   model: string;
   maxTokens: number;
   contextWindow: number;
@@ -65,6 +65,15 @@ export class FreeModelOrchestratorWorker {
       speed: 'fast',
       capabilities: ['chat', 'reasoning', 'multimodal'],
     },
+    {
+      name: 'Zephyr 7B (HuggingFace)',
+      provider: 'huggingface',
+      model: 'HuggingFaceH4/zephyr-7b-beta',
+      maxTokens: 4096,
+      contextWindow: 4096,
+      speed: 'medium',
+      capabilities: ['chat', 'reasoning'],
+    },
   ];
 
   constructor(env: WorkerEnv) {
@@ -93,6 +102,8 @@ export class FreeModelOrchestratorWorker {
           return !!this.env.TOGETHER_API_KEY;
         case 'gemini':
           return !!this.env.GOOGLE_AI_API_KEY;
+        case 'huggingface':
+          return !!this.env.HUGGINGFACE_API_KEY;
         default:
           return false;
       }
@@ -256,6 +267,43 @@ export class FreeModelOrchestratorWorker {
 
     const data = await response.json();
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    
+    // Simulate streaming by yielding chunks
+    const chunkSize = 50;
+    for (let i = 0; i < text.length; i += chunkSize) {
+      yield text.slice(i, i + chunkSize);
+    }
+  }
+
+  private async *streamHuggingFace(messages: Message[], model: ModelConfig): AsyncGenerator<string> {
+    // Convert messages to prompt
+    const prompt = messages.map(m => `${m.role}: ${m.content}`).join('\n\n');
+
+    const response = await fetch(
+      `https://api-inference.huggingface.co/models/${model.model}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.env.HUGGINGFACE_API_KEY}`,
+        },
+        body: JSON.stringify({
+          inputs: prompt,
+          parameters: {
+            max_new_tokens: 2000,
+            temperature: 0.7,
+            return_full_text: false,
+          },
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`HuggingFace API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const text = data[0]?.generated_text || '';
     
     // Simulate streaming by yielding chunks
     const chunkSize = 50;
