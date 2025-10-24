@@ -1,60 +1,46 @@
 # Cloudflare Workers Configuration for FlowState AI
 name = "flowstate-ai-backend"
-main = "src/workers/index.ts"
+main = "dist/worker.js"
 compatibility_date = "2024-01-01"
-node_compat = true
+node_compat = false
 
 # Worker settings
 workers_dev = true
-route = { pattern = "api.flowstate.ai/*", zone_name = "flowstate.ai" }
 
-# Environment variables (set these in Cloudflare dashboard)
-[env.production]
-name = "flowstate-ai-backend-production"
+# Environment variables (set these via wrangler secret put)
+# GROQ_API_KEY
+# TOGETHER_API_KEY
+# GOOGLE_AI_API_KEY
+# HUGGINGFACE_API_KEY
+# BRAVE_SEARCH_API_KEY
+# SERPER_API_KEY
+# TAVILY_API_KEY
 
-[env.staging]
-name = "flowstate-ai-backend-staging"
+# Bindings will be added after resource creation
+# Uncomment and configure after creating resources:
 
-# Bindings for Cloudflare services
-[[r2_buckets]]
-binding = "UPLOADS"
-bucket_name = "flowstate-uploads"
-preview_bucket_name = "flowstate-uploads-preview"
+# [[r2_buckets]]
+# binding = "UPLOADS"
+# bucket_name = "flowstate-uploads"
 
-[[d1_databases]]
-binding = "DB"
-database_name = "flowstate-db"
-database_id = "your-database-id"
-preview_database_id = "your-preview-database-id"
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "flowstate-db"
+# database_id = "your-database-id-here"
 
-[[kv_namespaces]]
-binding = "CACHE"
-id = "your-kv-namespace-id"
-preview_id = "your-preview-kv-namespace-id"
+# [[kv_namespaces]]
+# binding = "CACHE"
+# id = "your-kv-id-here"
 
-# Analytics Engine binding
-[[analytics_engine_datasets]]
-binding = "ANALYTICS"
+# [[analytics_engine_datasets]]
+# binding = "ANALYTICS"
 
 # Durable Objects (for WebSocket/real-time features)
-[[durable_objects.bindings]]
-name = "CHAT_SESSIONS"
-class_name = "ChatSession"
-script_name = "flowstate-ai-backend"
+# [[durable_objects.bindings]]
+# name = "CHAT_SESSIONS"
+# class_name = "ChatSession"
+# script_name = "flowstate-ai-backend"
 
-[[migrations]]
-tag = "v1"
-new_classes = ["ChatSession"]
-
-# Rate limiting
-[limits]
-cpu_ms = 50000
-
-# Build configuration
-[build]
-command = "npm run build:worker"
-cwd = "."
-watch_dirs = ["src"]
-
-[build.upload]
-format = "service-worker"
+# [[migrations]]
+# tag = "v1"
+# new_classes = ["ChatSession"]

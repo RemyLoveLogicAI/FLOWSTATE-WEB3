@@ -6,9 +6,8 @@
 
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { cache } from 'hono/cache';
-import { FreeModelOrchestrator } from '../services/freeModelOrchestrator';
-import { SuperAgentSuite } from '../services/superAgentSuite';
+import { FreeModelOrchestratorWorker } from './services/freeModelOrchestratorWorker';
+import { SuperAgentWorker } from './services/superAgentWorker';
 
 // Cloudflare Worker environment
 export interface Env {
@@ -57,7 +56,7 @@ app.get('/health', (c) => {
 // List available models
 app.get('/api/models', async (c) => {
   try {
-    const orchestrator = new FreeModelOrchestrator();
+    const orchestrator = new FreeModelOrchestratorWorker(c.env);
     const models = await orchestrator.listAvailableModels();
     
     return c.json({
@@ -87,7 +86,7 @@ app.post('/api/chat', async (c) => {
     }
 
     // Initialize orchestrator
-    const orchestrator = new FreeModelOrchestrator();
+    const orchestrator = new FreeModelOrchestratorWorker(c.env);
     
     // Create streaming response
     const stream = new ReadableStream({
