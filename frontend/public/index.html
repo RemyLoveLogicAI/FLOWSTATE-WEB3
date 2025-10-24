@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlowState AI Supreme - Decentralized Genius Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .tagline {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h2 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #4ade80;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .query-section {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .query-input {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            font-size: 1em;
+            margin-bottom: 15px;
+            resize: vertical;
+        }
+
+        .button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .result {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            border-left: 4px solid #4ade80;
+        }
+
+        .stat {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            opacity: 0.8;
+        }
+
+        .stat-value {
+            font-weight: bold;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .feature-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧠 FlowState AI Supreme</h1>
+            <p class="tagline">Decentralized Genius Level AI Platform</p>
+        </header>
+
+        <div class="grid">
+            <div class="card">
+                <h2>
+                    <span class="status-indicator"></span>
+                    System Status
+                </h2>
+                <div id="systemStatus">
+                    <div class="stat">
+                        <span class="stat-label">Status:</span>
+                        <span class="stat-value" id="status">Loading...</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Active Peers:</span>
+                        <span class="stat-value" id="peers">0</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Queries Processed:</span>
+                        <span class="stat-value" id="queries">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>🤖 AI Models</h2>
+                <div class="features">
+                    <div class="feature-badge">Genius GPT</div>
+                    <div class="feature-badge">Cognitive Enhancer</div>
+                    <div class="feature-badge">Vision Supreme</div>
+                    <div class="feature-badge">Quantum Reasoner</div>
+                    <div class="feature-badge">Neural Architect</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>🔗 Decentralized Features</h2>
+                <div class="features">
+                    <div class="feature-badge">Blockchain</div>
+                    <div class="feature-badge">IPFS</div>
+                    <div class="feature-badge">P2P Network</div>
+                    <div class="feature-badge">CRDT State</div>
+                    <div class="feature-badge">Zero-Knowledge</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="query-section">
+            <h2 style="margin-bottom: 20px;">🎯 AI Query Interface</h2>
+            <textarea 
+                id="queryInput" 
+                class="query-input" 
+                rows="4" 
+                placeholder="Enter your genius-level query here..."
+            ></textarea>
+            <button class="button" id="submitQuery" onclick="submitQuery()">
+                Process with Supreme AI
+            </button>
+            <div id="result"></div>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <h2>📊 Performance Metrics</h2>
+                <div id="metrics">
+                    <div class="stat">
+                        <span class="stat-label">Avg Response Time:</span>
+                        <span class="stat-value" id="avgTime">-- ms</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Success Rate:</span>
+                        <span class="stat-value" id="successRate">-- %</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>🧠 Cognitive Level</h2>
+                <div style="font-size: 2em; text-align: center; margin: 20px 0;">
+                    SUPREME
+                </div>
+                <div class="features" style="justify-content: center;">
+                    <div class="feature-badge">Meta-Learning</div>
+                    <div class="feature-badge">Self-Optimization</div>
+                    <div class="feature-badge">Genius Mode</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000/api';
+
+        // Load system status
+        async function loadStatus() {
+            try {
+                const response = await fetch(`${API_BASE}/status`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('status').textContent = 'Active';
+                    document.getElementById('peers').textContent = data.data.peers || 0;
+                    document.getElementById('queries').textContent = data.data.metrics.queriesProcessed || 0;
+                }
+            } catch (error) {
+                document.getElementById('status').textContent = 'Offline';
+                console.error('Failed to load status:', error);
+            }
+        }
+
+        // Load AI statistics
+        async function loadStats() {
+            try {
+                const response = await fetch(`${API_BASE}/ai/models`);
+                const data = await response.json();
+                
+                if (data.success && data.data) {
+                    document.getElementById('avgTime').textContent = 
+                        Math.round(data.data.averageResponseTime || 0) + ' ms';
+                    
+                    const successRate = data.data.totalQueries > 0 
+                        ? (data.data.successfulQueries / data.data.totalQueries * 100).toFixed(1)
+                        : 0;
+                    document.getElementById('successRate').textContent = successRate + ' %';
+                }
+            } catch (error) {
+                console.error('Failed to load stats:', error);
+            }
+        }
+
+        // Submit query
+        async function submitQuery() {
+            const input = document.getElementById('queryInput').value;
+            if (!input.trim()) {
+                alert('Please enter a query');
+                return;
+            }
+
+            const button = document.getElementById('submitQuery');
+            const resultDiv = document.getElementById('result');
+            
+            button.disabled = true;
+            button.innerHTML = '<span class="loading"></span> Processing...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/ai/query`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        query: {
+                            id: Date.now().toString(),
+                            content: input,
+                            complexity: 'high'
+                        }
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultDiv.innerHTML = `
+                        <div class="result">
+                            <h3>✅ Query Completed</h3>
+                            <p><strong>Model:</strong> ${data.data.modelId || 'Multi-model'}</p>
+                            <p><strong>Response:</strong> ${data.data.response || 'Processed successfully'}</p>
+                            <p><strong>Confidence:</strong> ${(data.data.confidence || 90).toFixed(1)}%</p>
+                            <p><strong>Processing Time:</strong> ${(data.data.processingTime || 0).toFixed(0)}ms</p>
+                        </div>
+                    `;
+                    
+                    // Refresh stats
+                    loadStatus();
+                    loadStats();
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="result" style="border-left-color: #ef4444;">
+                            <h3>❌ Error</h3>
+                            <p>${data.error}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="result" style="border-left-color: #ef4444;">
+                        <h3>❌ Request Failed</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            } finally {
+                button.disabled = false;
+                button.textContent = 'Process with Supreme AI';
+            }
+        }
+
+        // Initial load and periodic refresh
+        loadStatus();
+        loadStats();
+        setInterval(() => {
+            loadStatus();
+            loadStats();
+        }, 5000);
+
+        // Allow Enter key to submit
+        document.getElementById('queryInput').addEventListener('keypress', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') {
+                submitQuery();
+            }
+        });
+    </script>
+</body>
+</html>

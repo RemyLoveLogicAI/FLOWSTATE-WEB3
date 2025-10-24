@@ -1,0 +1,13 @@
+{
+  "name": "flowstate-ai-supreme-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for FlowState AI Supreme",
+  "type": "module",
+  "scripts": {
+    "dev": "node server.js",
+    "build": "echo 'Build complete'"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
