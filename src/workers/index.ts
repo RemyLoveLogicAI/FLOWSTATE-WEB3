@@ -134,7 +134,7 @@ app.post('/api/agent', async (c) => {
       return c.json({ error: 'Query is required' }, 400);
     }
 
-    const agent = new SuperAgentSuite();
+    const agent = new SuperAgentWorker();
     const result = await agent.executeAgent(query, maxSteps);
 
     return c.json({
@@ -171,7 +171,7 @@ app.post('/api/research', async (c) => {
     }
 
     // Perform research
-    const agent = new SuperAgentSuite();
+    const agent = new SuperAgentWorker();
     const tool = agent.getTools().find(t => t.name === 'deep_research');
     
     if (!tool) {
