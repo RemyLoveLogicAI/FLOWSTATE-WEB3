@@ -36,7 +36,7 @@
     "ipfs-http-client": "^60.0.1",
     "axios": "^1.6.2",
     "sharp": "^0.33.0",
-    "multer": "^1.4.5-lts.1",
+    "multer": "^2.0.2",
     "redis": "^4.6.11",
     "prisma": "^5.7.0",
     "@prisma/client": "^5.7.0",
