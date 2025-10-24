@@ -30,22 +30,31 @@ export class FreeModelOrchestratorWorker {
   private env: WorkerEnv;
   private models: ModelConfig[] = [
     {
-      name: 'Llama 3 70B (Groq)',
+      name: 'Llama 3.3 70B (Groq)',
       provider: 'groq',
-      model: 'llama3-70b-8192',
-      maxTokens: 8192,
-      contextWindow: 8192,
+      model: 'llama-3.3-70b-versatile',
+      maxTokens: 32768,
+      contextWindow: 131072,
       speed: 'very-fast',
       capabilities: ['chat', 'reasoning', 'code'],
     },
     {
-      name: 'Mixtral 8x7B (Groq)',
+      name: 'Llama 3.1 8B Instant (Groq)',
       provider: 'groq',
-      model: 'mixtral-8x7b-32768',
-      maxTokens: 32768,
-      contextWindow: 32768,
+      model: 'llama-3.1-8b-instant',
+      maxTokens: 8192,
+      contextWindow: 131072,
       speed: 'very-fast',
-      capabilities: ['chat', 'reasoning', 'multilingual'],
+      capabilities: ['chat', 'fast', 'instant'],
+    },
+    {
+      name: 'Groq Compound (Groq)',
+      provider: 'groq',
+      model: 'groq/compound',
+      maxTokens: 32768,
+      contextWindow: 131072,
+      speed: 'very-fast',
+      capabilities: ['chat', 'reasoning', 'advanced'],
     },
     {
       name: 'Llama 3 70B (Together)',
@@ -128,6 +137,9 @@ export class FreeModelOrchestratorWorker {
             return;
           case 'gemini':
             yield* this.streamGemini(messages, model);
+            return;
+          case 'huggingface':
+            yield* this.streamHuggingFace(messages, model);
             return;
         }
       } catch (error) {
