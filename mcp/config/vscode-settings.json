@@ -1,0 +1,17 @@
+{
+  "mcp.servers": {
+    "flowstate-voice": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "${workspaceFolder}/mcp/server/index.js"
+      ],
+      "env": {
+        "OPENAI_API_KEY": "${env:OPENAI_API_KEY}",
+        "ELEVENLABS_API_KEY": "${env:ELEVENLABS_API_KEY}"
+      },
+      "enabled": true
+    }
+  },
+  "mcp.enabled": true
+}

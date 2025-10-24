@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "flowstate-voice": {
+      "command": "node",
+      "args": [
+        "/path/to/flowstate-ai-web3/mcp/server/index.js"
+      ],
+      "env": {
+        "OPENAI_API_KEY": "your-openai-api-key",
+        "ELEVENLABS_API_KEY": "your-elevenlabs-api-key"
+      },
+      "description": "FlowState AI Voice MCP Server - Voice transcription, synthesis, and more"
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "cursor.mcp.servers": {
+    "flowstate-voice": {
+      "command": "node",
+      "args": [
+        "${workspaceFolder}/mcp/server/index.js"
+      ],
+      "env": {
+        "OPENAI_API_KEY": "${env:OPENAI_API_KEY}",
+        "ELEVENLABS_API_KEY": "${env:ELEVENLABS_API_KEY}"
+      }
+    }
+  },
+  "cursor.voice.enabled": true,
+  "cursor.voice.defaultVoice": "alloy",
+  "cursor.voice.autoTranscribe": true
+}
