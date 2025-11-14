@@ -1,0 +1,46 @@
+# Cloudflare Workers Configuration for FlowState AI
+name = "flowstate-ai-backend"
+main = "dist/worker.js"
+compatibility_date = "2024-01-01"
+node_compat = false
+
+# Worker settings
+workers_dev = true
+
+# Environment variables (set these via wrangler secret put)
+# GROQ_API_KEY
+# TOGETHER_API_KEY
+# GOOGLE_AI_API_KEY
+# HUGGINGFACE_API_KEY
+# BRAVE_SEARCH_API_KEY
+# SERPER_API_KEY
+# TAVILY_API_KEY
+
+# Bindings will be added after resource creation
+# Uncomment and configure after creating resources:
+
+# [[r2_buckets]]
+# binding = "UPLOADS"
+# bucket_name = "flowstate-uploads"
+
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "flowstate-db"
+# database_id = "your-database-id-here"
+
+# [[kv_namespaces]]
+# binding = "CACHE"
+# id = "your-kv-id-here"
+
+# [[analytics_engine_datasets]]
+# binding = "ANALYTICS"
+
+# Durable Objects (for WebSocket/real-time features)
+# [[durable_objects.bindings]]
+# name = "CHAT_SESSIONS"
+# class_name = "ChatSession"
+# script_name = "flowstate-ai-backend"
+
+# [[migrations]]
+# tag = "v1"
+# new_classes = ["ChatSession"]

@@ -1,0 +1,19 @@
+# Cloudflare Pages Configuration for FlowState AI Frontend
+name = "flowstate-ai"
+pages_build_output_dir = "dist"
+
+[build]
+command = "npm run build"
+cwd = "."
+
+[build.environment]
+NODE_VERSION = "20"
+
+# Custom domains (configure in Cloudflare dashboard)
+# Production: flowstate.ai
+# Staging: staging.flowstate.ai
+
+# Environment variables are set in Cloudflare Pages dashboard
+# Required variables:
+# - VITE_API_URL (e.g., https://api.flowstate.ai)
+# - VITE_WS_URL (e.g., wss://api.flowstate.ai)
