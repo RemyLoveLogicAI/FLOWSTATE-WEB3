@@ -86,13 +86,15 @@ export class SearchService {
       timestamp: new Date()
     };
 
-    // Cache the result
+    // Cache the result with strict size limit
     this.searchCache.set(cacheKey, { result, timestamp: Date.now() });
     
-    // Simple cache size management
-    if (this.searchCache.size > 50) {
+    // Enforce cache size limit by removing oldest entries
+    while (this.searchCache.size > 50) {
       const oldestKey = this.searchCache.keys().next().value;
-      this.searchCache.delete(oldestKey);
+      if (oldestKey) {
+        this.searchCache.delete(oldestKey);
+      }
     }
 
     return result;

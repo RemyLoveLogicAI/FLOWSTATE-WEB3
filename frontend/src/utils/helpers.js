@@ -84,8 +84,7 @@ export function debounce(func, wait) {
  * Throttle function - limits execution to once per wait period
  */
 export function throttle(func, wait) {
-  let inThrottle;
-  let lastFunc;
+  let inThrottle = false;
   let lastRan;
   
   return function executedFunction(...args) {
@@ -93,14 +92,22 @@ export function throttle(func, wait) {
       func(...args);
       lastRan = Date.now();
       inThrottle = true;
+      setTimeout(() => {
+        inThrottle = false;
+      }, wait);
     } else {
-      clearTimeout(lastFunc);
-      lastFunc = setTimeout(() => {
-        if (Date.now() - lastRan >= wait) {
-          func(...args);
-          lastRan = Date.now();
-        }
-      }, Math.max(wait - (Date.now() - lastRan), 0));
+      // Update last call to execute after throttle period
+      const timeSinceLastRun = Date.now() - lastRan;
+      const timeUntilNext = wait - timeSinceLastRun;
+      
+      if (timeUntilNext <= 0) {
+        func(...args);
+        lastRan = Date.now();
+        inThrottle = true;
+        setTimeout(() => {
+          inThrottle = false;
+        }, wait);
+      }
     }
   };
 }
@@ -121,10 +128,12 @@ export function memoize(func, keyResolver = (...args) => JSON.stringify(args)) {
     const result = func(...args);
     cache.set(key, result);
     
-    // Simple cache size limit
-    if (cache.size > 100) {
+    // Enforce cache size limit by removing oldest entries
+    while (cache.size > 100) {
       const firstKey = cache.keys().next().value;
-      cache.delete(firstKey);
+      if (firstKey) {
+        cache.delete(firstKey);
+      }
     }
     
     return result;

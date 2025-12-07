@@ -108,13 +108,15 @@ export class EnhancedSearchService {
       timestamp: Date.now(),
     };
 
-    // Cache the result
+    // Cache the result with strict size limit
     this.searchCache.set(query, { result, timestamp: Date.now() });
     
-    // Clean up old cache entries (simple LRU)
-    if (this.searchCache.size > 100) {
+    // Enforce cache size limit by removing oldest entries
+    while (this.searchCache.size > 100) {
       const oldestKey = this.searchCache.keys().next().value;
-      this.searchCache.delete(oldestKey);
+      if (oldestKey) {
+        this.searchCache.delete(oldestKey);
+      }
     }
 
     return result;
