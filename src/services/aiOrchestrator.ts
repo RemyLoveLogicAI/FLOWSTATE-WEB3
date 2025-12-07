@@ -45,22 +45,25 @@ export class AIOrchestrator {
     );
   }
 
+  // Pre-compiled regexes for better performance
+  private static readonly VISION_REGEX = /image|photo|picture|visual/i;
+  private static readonly CODE_REGEX = /code|program|function|script/i;
+  private static readonly REASONING_REGEX = /analyze|reason|think|complex/i;
+
   /**
    * Automatically select the best AI model based on query
    */
   selectModel(query: string, options?: any): string {
-    const lowerQuery = query.toLowerCase();
-    
     // Check for specific requirements
-    if (options?.needsVision || /image|photo|picture|visual/.test(lowerQuery)) {
+    if (options?.needsVision || AIOrchestrator.VISION_REGEX.test(query)) {
       return 'gemini-pro-vision';
     }
     
-    if (options?.needsCode || /code|program|function|script/.test(lowerQuery)) {
+    if (options?.needsCode || AIOrchestrator.CODE_REGEX.test(query)) {
       return 'gpt-4-turbo';
     }
     
-    if (options?.needsReasoning || /analyze|reason|think|complex/.test(lowerQuery)) {
+    if (options?.needsReasoning || AIOrchestrator.REASONING_REGEX.test(query)) {
       return 'claude-3-opus';
     }
     

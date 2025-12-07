@@ -512,8 +512,16 @@ export class FreeModelOrchestrator {
   async listAvailableModels(): Promise<ModelConfig[]> {
     const available: ModelConfig[] = [];
 
-    for (const model of this.models) {
-      if (await this.testModelAvailability(model)) {
+    // Test models in parallel for faster results
+    const availabilityTests = this.models.map(async (model) => ({
+      model,
+      isAvailable: await this.testModelAvailability(model),
+    }));
+
+    const results = await Promise.all(availabilityTests);
+    
+    for (const { model, isAvailable } of results) {
+      if (isAvailable) {
         available.push(model);
       }
     }

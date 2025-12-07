@@ -66,7 +66,7 @@ export function getFirstLine(text, maxLength = 60) {
 }
 
 /**
- * Debounce function
+ * Debounce function - delays execution until after wait time has elapsed since last call
  */
 export function debounce(func, wait) {
   let timeout;
@@ -77,6 +77,57 @@ export function debounce(func, wait) {
     };
     clearTimeout(timeout);
     timeout = setTimeout(later, wait);
+  };
+}
+
+/**
+ * Throttle function - limits execution to once per wait period
+ */
+export function throttle(func, wait) {
+  let inThrottle;
+  let lastFunc;
+  let lastRan;
+  
+  return function executedFunction(...args) {
+    if (!inThrottle) {
+      func(...args);
+      lastRan = Date.now();
+      inThrottle = true;
+    } else {
+      clearTimeout(lastFunc);
+      lastFunc = setTimeout(() => {
+        if (Date.now() - lastRan >= wait) {
+          func(...args);
+          lastRan = Date.now();
+        }
+      }, Math.max(wait - (Date.now() - lastRan), 0));
+    }
+  };
+}
+
+/**
+ * Memoize function - caches results of expensive function calls
+ */
+export function memoize(func, keyResolver = (...args) => JSON.stringify(args)) {
+  const cache = new Map();
+  
+  return function memoized(...args) {
+    const key = keyResolver(...args);
+    
+    if (cache.has(key)) {
+      return cache.get(key);
+    }
+    
+    const result = func(...args);
+    cache.set(key, result);
+    
+    // Simple cache size limit
+    if (cache.size > 100) {
+      const firstKey = cache.keys().next().value;
+      cache.delete(firstKey);
+    }
+    
+    return result;
   };
 }
 

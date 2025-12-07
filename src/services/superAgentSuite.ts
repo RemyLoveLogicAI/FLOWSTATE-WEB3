@@ -267,7 +267,17 @@ Final Answer: [Your comprehensive answer]`;
 
       const thought = thoughtMatch ? thoughtMatch[1].trim() : '';
       const action = actionMatch[1].trim();
-      const input = inputMatch ? JSON.parse(inputMatch[1]) : {};
+      let input: any = {};
+      
+      // Parse JSON input with error handling
+      if (inputMatch) {
+        try {
+          input = JSON.parse(inputMatch[1]);
+        } catch (parseError) {
+          console.warn('Failed to parse action input:', inputMatch[1]);
+          input = {};
+        }
+      }
 
       // Execute tool
       const tool = this.tools.get(action);
@@ -478,13 +488,20 @@ Final Answer: [Your comprehensive answer]`;
    */
   private async analyzeText(text: string, type: string): Promise<any> {
     if (type === 'sentiment') {
-      // Simple sentiment analysis
-      const positive = ['good', 'great', 'excellent', 'amazing', 'wonderful', 'love', 'best'];
-      const negative = ['bad', 'terrible', 'awful', 'hate', 'worst', 'poor'];
+      // Simple sentiment analysis - optimized with Set for O(1) lookups
+      const positiveWords = new Set(['good', 'great', 'excellent', 'amazing', 'wonderful', 'love', 'best']);
+      const negativeWords = new Set(['bad', 'terrible', 'awful', 'hate', 'worst', 'poor']);
       
       const lowerText = text.toLowerCase();
-      const positiveCount = positive.filter(word => lowerText.includes(word)).length;
-      const negativeCount = negative.filter(word => lowerText.includes(word)).length;
+      const words = lowerText.split(/\s+/);
+      
+      let positiveCount = 0;
+      let negativeCount = 0;
+      
+      for (const word of words) {
+        if (positiveWords.has(word)) positiveCount++;
+        if (negativeWords.has(word)) negativeCount++;
+      }
       
       let sentiment = 'neutral';
       if (positiveCount > negativeCount) sentiment = 'positive';
@@ -494,13 +511,13 @@ Final Answer: [Your comprehensive answer]`;
     }
 
     if (type === 'keywords') {
-      // Extract keywords (simple word frequency)
+      // Extract keywords (optimized word frequency)
       const words = text.toLowerCase().match(/\b\w{4,}\b/g) || [];
       const frequency: Record<string, number> = {};
       
-      words.forEach(word => {
+      for (const word of words) {
         frequency[word] = (frequency[word] || 0) + 1;
-      });
+      }
       
       const keywords = Object.entries(frequency)
         .sort((a, b) => b[1] - a[1])
