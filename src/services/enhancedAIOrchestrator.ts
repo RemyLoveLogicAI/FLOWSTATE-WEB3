@@ -403,6 +403,7 @@ export class EnhancedAIOrchestrator {
   // Pre-compiled regexes for performance
   private static readonly CODE_BLOCK_REGEX = /```/;
   private static readonly CODE_KEYWORD_REGEX = /\bcode\b/i;
+  private static readonly RESEARCH_KEYWORD = 'research';
 
   /**
    * Analyze conversation and suggest best model
@@ -411,10 +412,11 @@ export class EnhancedAIOrchestrator {
     const lastMessage = messages[messages.length - 1];
     const hasImages = lastMessage.metadata?.attachments?.some(a => a.type === 'image');
     const content = lastMessage.content;
+    const contentLower = content.toLowerCase();
     const hasCode = EnhancedAIOrchestrator.CODE_BLOCK_REGEX.test(content) || 
                    EnhancedAIOrchestrator.CODE_KEYWORD_REGEX.test(content);
     const isComplex = content.length > 500;
-    const needsResearch = content.toLowerCase().includes('research') ||
+    const needsResearch = contentLower.includes(EnhancedAIOrchestrator.RESEARCH_KEYWORD) ||
                          content.includes('?');
 
     if (hasImages) return 'geminiProVision';

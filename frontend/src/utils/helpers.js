@@ -85,29 +85,14 @@ export function debounce(func, wait) {
  */
 export function throttle(func, wait) {
   let inThrottle = false;
-  let lastRan;
   
   return function executedFunction(...args) {
     if (!inThrottle) {
       func(...args);
-      lastRan = Date.now();
       inThrottle = true;
       setTimeout(() => {
         inThrottle = false;
       }, wait);
-    } else {
-      // Update last call to execute after throttle period
-      const timeSinceLastRun = Date.now() - lastRan;
-      const timeUntilNext = wait - timeSinceLastRun;
-      
-      if (timeUntilNext <= 0) {
-        func(...args);
-        lastRan = Date.now();
-        inThrottle = true;
-        setTimeout(() => {
-          inThrottle = false;
-        }, wait);
-      }
     }
   };
 }
@@ -117,6 +102,7 @@ export function throttle(func, wait) {
  */
 export function memoize(func, keyResolver = (...args) => JSON.stringify(args)) {
   const cache = new Map();
+  const MAX_SIZE = 100;
   
   return function memoized(...args) {
     const key = keyResolver(...args);
@@ -129,11 +115,14 @@ export function memoize(func, keyResolver = (...args) => JSON.stringify(args)) {
     cache.set(key, result);
     
     // Enforce cache size limit by removing oldest entries
-    while (cache.size > 100) {
+    // Use a counter to prevent infinite loop
+    let evictions = 0;
+    while (cache.size > MAX_SIZE && evictions < MAX_SIZE) {
       const firstKey = cache.keys().next().value;
-      if (firstKey) {
+      if (firstKey !== undefined) {
         cache.delete(firstKey);
       }
+      evictions++;
     }
     
     return result;

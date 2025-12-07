@@ -90,11 +90,15 @@ export class SearchService {
     this.searchCache.set(cacheKey, { result, timestamp: Date.now() });
     
     // Enforce cache size limit by removing oldest entries
-    while (this.searchCache.size > 50) {
+    // Use a counter to prevent infinite loop
+    const MAX_SIZE = 50;
+    let evictions = 0;
+    while (this.searchCache.size > MAX_SIZE && evictions < MAX_SIZE) {
       const oldestKey = this.searchCache.keys().next().value;
-      if (oldestKey) {
+      if (oldestKey !== undefined) {
         this.searchCache.delete(oldestKey);
       }
+      evictions++;
     }
 
     return result;
