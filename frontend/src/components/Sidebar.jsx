@@ -6,12 +6,16 @@ import {
   Trash2, 
   Search,
   X,
-  ChevronLeft
+  ChevronLeft,
+  MoreVertical,
+  Download
 } from 'lucide-react';
 import { formatRelativeTime, getFirstLine } from '../utils/helpers';
+import { ExportImportMenu } from './ExportImport';
 
 export function Sidebar({ isOpen, onClose }) {
   const [searchQuery, setSearchQuery] = useState('');
+  const [showExportMenu, setShowExportMenu] = useState(false);
   
   const conversations = useChatStore((state) => state.conversations);
   const currentConversationId = useChatStore((state) => state.currentConversationId);
@@ -78,13 +82,37 @@ export function Sidebar({ isOpen, onClose }) {
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
             Conversations
           </h2>
-          <button
-            onClick={onClose}
-            className="md:hidden p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
-            aria-label="Close sidebar"
-          >
-            <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-          </button>
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              <button
+                onClick={() => setShowExportMenu(!showExportMenu)}
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                aria-label="Export/Import"
+              >
+                <Download className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              </button>
+              
+              {showExportMenu && (
+                <>
+                  <div
+                    className="fixed inset-0 z-10"
+                    onClick={() => setShowExportMenu(false)}
+                  />
+                  <div className="absolute right-0 top-12 z-20">
+                    <ExportImportMenu onClose={() => setShowExportMenu(false)} />
+                  </div>
+                </>
+              )}
+            </div>
+            
+            <button
+              onClick={onClose}
+              className="md:hidden p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+              aria-label="Close sidebar"
+            >
+              <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+            </button>
+          </div>
         </div>
 
         {/* New Chat Button */}
@@ -107,6 +135,7 @@ export function Sidebar({ isOpen, onClose }) {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search conversations..."
+              data-search-input
               className="w-full pl-10 pr-10 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 text-sm text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
             />
             {searchQuery && (

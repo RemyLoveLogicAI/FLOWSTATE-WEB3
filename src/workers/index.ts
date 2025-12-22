@@ -32,9 +32,24 @@ export interface Env {
 // Initialize Hono app
 const app = new Hono<{ Bindings: Env }>();
 
-// CORS configuration
+// CORS configuration - Allow development and production origins
 app.use('/*', cors({
-  origin: ['https://flowstate.pages.dev', 'http://localhost:5173'],
+  origin: (origin) => {
+    // Allow production domain
+    if (origin === 'https://flowstate.pages.dev') return origin;
+    
+    // Allow localhost for development
+    if (origin?.startsWith('http://localhost:')) return origin;
+    
+    // Allow sandbox URLs for development
+    if (origin?.includes('.sandbox.novita.ai')) return origin;
+    
+    // Allow any other localhost variants
+    if (origin === 'http://127.0.0.1:5173' || origin === 'http://127.0.0.1:5174' || origin === 'http://127.0.0.1:5175') return origin;
+    
+    // Default to production domain
+    return 'https://flowstate.pages.dev';
+  },
   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowHeaders: ['Content-Type', 'Authorization'],
   exposeHeaders: ['Content-Length'],

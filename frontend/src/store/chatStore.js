@@ -58,13 +58,20 @@ export const useChatStore = create(
           messages: { ...state.messages, [id]: [] },
         }));
         
-        return id;
+        return conversation;
       },
 
       /**
        * Select conversation
        */
       selectConversation: (id) => {
+        set({ currentConversationId: id });
+      },
+
+      /**
+       * Set current conversation (alias for selectConversation)
+       */
+      setCurrentConversation: (id) => {
         set({ currentConversationId: id });
       },
 
@@ -85,6 +92,17 @@ export const useChatStore = create(
               : state.currentConversationId,
           };
         });
+      },
+
+      /**
+       * Update conversation
+       */
+      updateConversation: (id, updates) => {
+        set((state) => ({
+          conversations: state.conversations.map(c =>
+            c.id === id ? { ...c, ...updates, updatedAt: new Date().toISOString() } : c
+          ),
+        }));
       },
 
       /**
