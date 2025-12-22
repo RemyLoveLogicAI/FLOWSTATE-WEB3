@@ -5,12 +5,21 @@ import { InputArea } from './InputArea';
 import { Sidebar } from './Sidebar';
 import { useChat } from '../hooks/useChat';
 import { useConversations } from '../hooks/useConversations';
+import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
+import { useChatStore } from '../store/chatStore';
 
 export function ChatInterface() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   
-  const { currentConversationId } = useConversations();
+  const { currentConversationId, createConversation } = useConversations();
   const { messages, isLoading, sendMessage } = useChat(currentConversationId);
+  
+  const setListening = useChatStore((state) => state.setListening);
+  const isListening = useChatStore((state) => state.isListening);
+  const setSpeaking = useChatStore((state) => state.setSpeaking);
+  const isSpeaking = useChatStore((state) => state.isSpeaking);
+  const updateVoiceSettings = useChatStore((state) => state.updateVoiceSettings);
+  const voiceSettings = useChatStore((state) => state.voiceSettings);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -19,6 +28,27 @@ export function ChatInterface() {
   const handleSendMessage = (message) => {
     sendMessage(message);
   };
+
+  const handleToggleVoice = () => {
+    setListening(!isListening);
+  };
+
+  const handleToggleSpeaking = () => {
+    const newValue = !isSpeaking;
+    setSpeaking(newValue);
+    updateVoiceSettings({ autoSpeak: newValue });
+  };
+
+  const handleNewConversation = () => {
+    createConversation('New Conversation');
+  };
+
+  // Setup keyboard shortcuts
+  useKeyboardShortcuts({
+    onToggleVoice: handleToggleVoice,
+    onToggleSpeaking: handleToggleSpeaking,
+    onNewConversation: handleNewConversation,
+  });
 
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
