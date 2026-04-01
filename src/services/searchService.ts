@@ -20,6 +20,8 @@ export class SearchService {
   private aiOrchestrator: AIOrchestrator;
   private serpApiKey: string;
   private newsApiKey: string;
+  private searchCache: Map<string, { result: SearchResponse; timestamp: number }> = new Map();
+  private readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
   constructor() {
     this.aiOrchestrator = new AIOrchestrator();
@@ -39,6 +41,16 @@ export class SearchService {
       maxResults?: number;
     }
   ): Promise<SearchResponse> {
+    // Create cache key from query and options
+    const cacheKey = JSON.stringify({ query, options });
+    
+    // Check cache first
+    const cached = this.searchCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < this.CACHE_TTL) {
+      console.log('✓ Returning cached search result');
+      return cached.result;
+    }
+
     const maxResults = options?.maxResults || 10;
     const searches: Promise<SearchResult[]>[] = [];
 
@@ -67,12 +79,29 @@ export class SearchService {
       synthesis = await this.synthesizeResults(query, uniqueResults);
     }
 
-    return {
+    const result = {
       results: uniqueResults.slice(0, maxResults),
       synthesis,
       sources: uniqueResults.map(r => r.url),
       timestamp: new Date()
     };
+
+    // Cache the result with strict size limit
+    this.searchCache.set(cacheKey, { result, timestamp: Date.now() });
+    
+    // Enforce cache size limit by removing oldest entries
+    // Use a counter to prevent infinite loop
+    const MAX_SIZE = 50;
+    let evictions = 0;
+    while (this.searchCache.size > MAX_SIZE && evictions < MAX_SIZE) {
+      const oldestKey = this.searchCache.keys().next().value;
+      if (oldestKey !== undefined) {
+        this.searchCache.delete(oldestKey);
+      }
+      evictions++;
+    }
+
+    return result;
   }
 
   /**

@@ -66,7 +66,7 @@ export function getFirstLine(text, maxLength = 60) {
 }
 
 /**
- * Debounce function
+ * Debounce function - delays execution until after wait time has elapsed since last call
  */
 export function debounce(func, wait) {
   let timeout;
@@ -77,6 +77,55 @@ export function debounce(func, wait) {
     };
     clearTimeout(timeout);
     timeout = setTimeout(later, wait);
+  };
+}
+
+/**
+ * Throttle function - limits execution to once per wait period
+ */
+export function throttle(func, wait) {
+  let inThrottle = false;
+  
+  return function executedFunction(...args) {
+    if (!inThrottle) {
+      func(...args);
+      inThrottle = true;
+      setTimeout(() => {
+        inThrottle = false;
+      }, wait);
+    }
+  };
+}
+
+/**
+ * Memoize function - caches results of expensive function calls
+ */
+export function memoize(func, keyResolver = (...args) => JSON.stringify(args)) {
+  const cache = new Map();
+  const MAX_SIZE = 100;
+  
+  return function memoized(...args) {
+    const key = keyResolver(...args);
+    
+    if (cache.has(key)) {
+      return cache.get(key);
+    }
+    
+    const result = func(...args);
+    cache.set(key, result);
+    
+    // Enforce cache size limit by removing oldest entries
+    // Use a counter to prevent infinite loop
+    let evictions = 0;
+    while (cache.size > MAX_SIZE && evictions < MAX_SIZE) {
+      const firstKey = cache.keys().next().value;
+      if (firstKey !== undefined) {
+        cache.delete(firstKey);
+      }
+      evictions++;
+    }
+    
+    return result;
   };
 }
 

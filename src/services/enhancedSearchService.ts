@@ -42,6 +42,8 @@ export class EnhancedSearchService {
     serper?: string;
     tavily?: string;
   };
+  private searchCache: Map<string, { result: ResearchResult; timestamp: number }> = new Map();
+  private readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
   constructor() {
     this.anthropic = new Anthropic({
@@ -61,6 +63,13 @@ export class EnhancedSearchService {
    */
   async deepResearch(query: string): Promise<ResearchResult> {
     console.log(`🔍 Starting deep research for: ${query}`);
+
+    // Check cache first
+    const cached = this.searchCache.get(query);
+    if (cached && Date.now() - cached.timestamp < this.CACHE_TTL) {
+      console.log('✓ Returning cached result');
+      return cached.result;
+    }
 
     // Phase 1: Multi-source search
     const [webResults, newsResults, academicResults] = await Promise.allSettled([
@@ -90,7 +99,7 @@ export class EnhancedSearchService {
       snippet: r.snippet,
     }));
 
-    return {
+    const result = {
       query,
       results: topResults,
       synthesis,
@@ -98,6 +107,23 @@ export class EnhancedSearchService {
       confidence: this.calculateConfidence(topResults),
       timestamp: Date.now(),
     };
+
+    // Cache the result with strict size limit
+    this.searchCache.set(query, { result, timestamp: Date.now() });
+    
+    // Enforce cache size limit by removing oldest entries
+    // Use a counter to prevent infinite loop
+    const MAX_SIZE = 100;
+    let evictions = 0;
+    while (this.searchCache.size > MAX_SIZE && evictions < MAX_SIZE) {
+      const oldestKey = this.searchCache.keys().next().value;
+      if (oldestKey !== undefined) {
+        this.searchCache.delete(oldestKey);
+      }
+      evictions++;
+    }
+
+    return result;
   }
 
   /**
@@ -292,13 +318,18 @@ export class EnhancedSearchService {
 
     return results
       .map(result => {
-        // Calculate relevance score
-        const titleMatch = queryTerms.filter(term =>
-          result.title.toLowerCase().includes(term)
-        ).length;
-        const snippetMatch = queryTerms.filter(term =>
-          result.snippet.toLowerCase().includes(term)
-        ).length;
+        // Pre-compute lowercase strings once
+        const titleLower = result.title.toLowerCase();
+        const snippetLower = result.snippet.toLowerCase();
+        
+        // Calculate relevance score using pre-computed strings
+        let titleMatch = 0;
+        let snippetMatch = 0;
+        
+        for (const term of queryTerms) {
+          if (titleLower.includes(term)) titleMatch++;
+          if (snippetLower.includes(term)) snippetMatch++;
+        }
 
         const score =
           (titleMatch * 2 + snippetMatch) / queryTerms.length +

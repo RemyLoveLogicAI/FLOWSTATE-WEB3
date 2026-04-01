@@ -400,17 +400,24 @@ export class EnhancedAIOrchestrator {
     }));
   }
 
+  // Pre-compiled regexes for performance
+  private static readonly CODE_BLOCK_REGEX = /```/;
+  private static readonly CODE_KEYWORD_REGEX = /\bcode\b/i;
+  private static readonly RESEARCH_KEYWORD = 'research';
+
   /**
    * Analyze conversation and suggest best model
    */
   suggestModel(messages: Message[]): string {
     const lastMessage = messages[messages.length - 1];
     const hasImages = lastMessage.metadata?.attachments?.some(a => a.type === 'image');
-    const hasCode = lastMessage.content.includes('```') || 
-                   lastMessage.content.toLowerCase().includes('code');
-    const isComplex = lastMessage.content.length > 500;
-    const needsResearch = lastMessage.content.toLowerCase().includes('research') ||
-                         lastMessage.content.includes('?');
+    const content = lastMessage.content;
+    const contentLower = content.toLowerCase();
+    const hasCode = EnhancedAIOrchestrator.CODE_BLOCK_REGEX.test(content) || 
+                   EnhancedAIOrchestrator.CODE_KEYWORD_REGEX.test(content);
+    const isComplex = content.length > 500;
+    const needsResearch = contentLower.includes(EnhancedAIOrchestrator.RESEARCH_KEYWORD) ||
+                         content.includes('?');
 
     if (hasImages) return 'geminiProVision';
     if (hasCode) return 'gpt4';
