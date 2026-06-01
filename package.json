@@ -68,7 +68,7 @@
     "tsx": "^4.7.0",
     "tsc-alias": "^1.8.8",
     "esbuild": "^0.27.3",
-    "vitest": "^1.0.4",
+    "vitest": "^4.1.8",
     "concurrently": "^8.2.2",
     "eslint": "^8.55.0",
     "prettier": "^3.1.1"
